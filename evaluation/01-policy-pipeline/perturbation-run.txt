@@ -1,0 +1,15 @@
+$ policy-extractor extract POL-2025-001-PERTURBED.txt --policy-id POL-2025-001-PERTURBED
+   (premium amount replaced by an unenclosed-schedule reference; model id pinned - see run_with_pinned_model.py)
+
+[model pin] extractor=claude-haiku-4-5-20251001
+2026-10-01 21:13:39,293 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:13:39,312 INFO validation_failed
+{
+  "category": "missing_source",
+  "detected_pattern": "premium_amount_absent",
+  "field": "premium_amount",
+  "kind": "escalation",
+  "policy_id": "POL-2025-001-PERTURBED",
+  "reason": "Field 'premium_amount' returned null \u2014 the source document does not contain this information. Retry is futile; escalate to human review."
+}
+exit code: 1
