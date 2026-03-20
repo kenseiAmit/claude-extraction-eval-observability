@@ -1,0 +1,64 @@
+$ policy-extractor pipeline data/policies/ --routing-out routing_decisions.json --spot-check-pct 0.2 --seed 42
+   (run via run_with_pinned_model.py - see environment.txt note (a); only the model id is overridden)
+
+[model pin] extractor=claude-haiku-4-5-20251001
+2026-10-01 21:11:11,870 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:18,418 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:18,419 INFO review_disagreement policy_id=POL-2025-001 fields=['coverage_limit']
+2026-10-01 21:11:21,110 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:29,325 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:29,325 INFO review_disagreement policy_id=POL-2025-002 fields=['deductible', 'coverage_limit', 'endorsements']
+2026-10-01 21:11:31,998 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:37,766 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:37,770 INFO review_disagreement policy_id=POL-2025-003 fields=['coverage_limit']
+2026-10-01 21:11:41,147 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:46,653 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:46,653 INFO review_disagreement policy_id=POL-2025-004 fields=['deductible']
+2026-10-01 21:11:49,785 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:55,220 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:11:55,221 INFO review_disagreement policy_id=POL-2025-005 fields=['deductible']
+2026-10-01 21:11:58,304 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:03,583 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:03,584 INFO review_disagreement policy_id=POL-2025-006 fields=['deductible']
+2026-10-01 21:12:06,912 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:12,368 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:12,369 INFO review_disagreement policy_id=POL-2025-007 fields=['deductible']
+2026-10-01 21:12:15,377 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:20,601 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:20,602 INFO review_disagreement policy_id=POL-2025-008 fields=['policy_type']
+2026-10-01 21:12:23,429 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:23,430 INFO validation_failed
+2026-10-01 21:12:26,624 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:26,625 INFO validation_failed
+2026-10-01 21:12:30,517 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:35,734 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:35,735 INFO review_disagreement policy_id=POL-2025-010 fields=['premium_amount']
+{
+  "decisions_written": 9,
+  "auto_approve": 0,
+  "human_review": 9,
+  "spot_check": 0,
+  "escalations": 1,
+  "pattern_summary": {
+    "endorsements_absent": {
+      "count": 1,
+      "policies": [
+        "POL-2025-009"
+      ],
+      "categories": [
+        "missing_source"
+      ]
+    },
+    "premium_does_not_match_components": {
+      "count": 1,
+      "policies": [
+        "POL-2025-010"
+      ],
+      "categories": [
+        "consistency"
+      ]
+    }
+  },
+  "output_path": "routing_decisions.json"
+}
+exit code: 0
