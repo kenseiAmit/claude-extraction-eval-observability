@@ -1,14 +1,14 @@
 <div align="center">
-  <img src="assets/hero-banner.svg" alt="Claude Extraction Eval & Calibration" width="100%" />
+  <img src="assets/hero-banner.svg" alt="Claude Extraction Eval &amp; Calibration" width="100%" />
   <br/><br/>
-  [![CI](https://github.com/kenseiAmit/claude-extraction-eval-observability/actions/workflows/ci.yml/badge.svg)](https://github.com/kenseiAmit/claude-extraction-eval-observability/actions/workflows/ci.yml)
-  ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
-  ![Claude](https://img.shields.io/badge/Anthropic-Claude%20Haiku%204.5-2563EB?style=flat-square)
-  ![Pytest](https://img.shields.io/badge/Pytest-104%20Passed%20(0%20Mypy%2FRuff%20Errors)-16A34A?style=flat-square&logo=pytest&logoColor=white)
-  ![Calibration](https://img.shields.io/badge/Eval-Sliced%20Brier%20%2B%20Perturbation%20Testing-0D9488?style=flat-square)
-  ![License](https://img.shields.io/badge/License-MIT-slate?style=flat-square)
-
-  <br/>
+  <p>
+    <a href="https://github.com/kenseiAmit/claude-extraction-eval-observability/actions/workflows/ci.yml"><img src="https://github.com/kenseiAmit/claude-extraction-eval-observability/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+    <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/Anthropic-Claude%20Haiku%204.5-2563EB?style=flat-square" alt="Claude" />
+    <img src="https://img.shields.io/badge/Pytest-104%20Passed%20%280%20Mypy%2FRuff%20Errors%29-16A34A?style=flat-square&amp;logo=pytest&amp;logoColor=white" alt="Pytest" />
+    <img src="https://img.shields.io/badge/Eval-Sliced%20Brier%20%2B%20Perturbation%20Testing-0D9488?style=flat-square" alt="Calibration" />
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-475569?style=flat-square" alt="License" /></a>
+  </p>
   <img src="assets/live-demo.svg" alt="Live Execution Trace" width="96%" />
 </div>
 
