@@ -1,5 +1,6 @@
 # Calibrated Document Extraction, HITL Routing & Multi-Source Synthesis Evaluation Suite
 
+[![CI](https://github.com/kenseiAmit/claude-extraction-eval-observability/actions/workflows/ci.yml/badge.svg)](https://github.com/kenseiAmit/claude-extraction-eval-observability/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Claude](https://img.shields.io/badge/Anthropic-Claude%20Haiku%204.5-2563EB?style=flat-square)
 ![Pytest](https://img.shields.io/badge/Pytest-104%20Passed%20(0%20Mypy%2FRuff%20Errors)-16A34A?style=flat-square&logo=pytest&logoColor=white)

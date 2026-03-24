@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-monorepo:
+    name: 3-Package Pytest Suite (104 Offline Tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install CPU PyTorch & monorepo packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e "./packages/policy-extractor[dev]" -e "./packages/mortgage-extractor[dev]" -e "./packages/supply-chain-risk[dev]"
+      - name: Test policy-extractor
+        working-directory: packages/policy-extractor
+        run: pytest -m "not live" -v
+      - name: Test mortgage-extractor
+        working-directory: packages/mortgage-extractor
+        run: pytest -v
+      - name: Test supply-chain-risk
+        working-directory: packages/supply-chain-risk
+        run: pytest -m "not live" -v
