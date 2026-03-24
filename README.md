@@ -1,37 +1,74 @@
 # Calibrated Document Extraction, HITL Routing & Multi-Source Synthesis Evaluation Suite
 
-Production evaluation, calibration, and observability monorepo for **Anthropic Claude (`claude-haiku-4-5-20251001`)** structured extraction and multi-agent synthesis pipelines—verified across **104 automated `pytest` tests (`0` `mypy` / `ruff` errors)** and controlled fault/perturbation experiments.
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![Claude](https://img.shields.io/badge/Anthropic-Claude%20Haiku%204.5-2563EB?style=flat-square)
+![Pytest](https://img.shields.io/badge/Pytest-104%20Passed%20(0%20Mypy%2FRuff%20Errors)-16A34A?style=flat-square&logo=pytest&logoColor=white)
+![Calibration](https://img.shields.io/badge/Eval-Sliced%20Brier%20%2B%20Perturbation%20Testing-0D9488?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-slate?style=flat-square)
+
+Production evaluation, confidence calibration, and observability monorepo for **Anthropic Claude** structured extraction and multi-source synthesis pipelines—verified across **`104` `pytest` tests** and controlled fault-injection experiments.
+
+![Brier Calibration & Perturbation Telemetry](docs/images/brier_calibration_and_perturbation.png)
 
 ---
 
-## Monorepo Architecture & Headline Empirical Findings
+## 1. Three-Package Architecture & Empirical Highlights
 
-| Package | Test Suite | Core Reliability Mechanism | Key Quantitative Finding |
+| Package | Tests | Reliability Pattern | Verified Perturbation / Calibration Result |
 | :--- | :---: | :--- | :--- |
-| **[`packages/policy-extractor`](packages/policy-extractor)** | `45 passed` | Error-classified retry (`missing_source` vs `format`), independent blind reviewer, 3-signal HITL router, sliced Brier calibration | Sliced `policy_type × field` Brier score exposed **`umbrella / exclusions` at `conf=0.93, acc=0.00, brier=0.865`** hidden behind aggregate `0.291`; blind reviewer caught `6` overconfident errors (`POL-2025-003` at `0.95` conf). |
-| **[`packages/mortgage-extractor`](packages/mortgage-extractor)** | `25 passed` | Two-pass classifier → nullable doc-type schema + Python cross-field arithmetic consistency validator | Deterministically caught `-$1,250.00` paystub earnings/YTD discrepancy (`exit 1`) that passed schema validation; verified clean `delta: 0.0` (`exit 0`) on repaired fixture. |
-| **[`packages/supply-chain-risk`](packages/supply-chain-risk)** | `34 passed` | `ReaderResult` timeout isolation, `sentence-transformers` vector claim memory, date-guarded corroboration vs `ESCALATE` | `--simulate-timeout` degraded cleanly (`exit 0`) without polluting Chroma/vector store with partial claims, surfacing `Sources unavailable: logistics` and `[single source only]` provenance badges. |
+| **[`packages/policy-extractor`](packages/policy-extractor)** | `45 passed` | Error-classified retry (`missing_source` vs `format`), blind second-model reviewer, 3-signal HITL router, sliced Brier calibration | Unmasked `umbrella / exclusions` (`conf=0.93, acc=0.00, brier=0.865`) hidden behind `0.291` aggregate Brier; halted `missing_source` after `1` call instead of `4`. |
+| **[`packages/mortgage-extractor`](packages/mortgage-extractor)** | `25 passed` | Two-pass classifier → nullable doc-type schema + Python cross-field arithmetic consistency validator | Caught `-$1,250.00` paystub earnings/YTD mismatch (`exit 1`); verified `consistent: true` (`exit 0`) on repaired fixture. |
+| **[`packages/supply-chain-risk`](packages/supply-chain-risk)** | `34 passed` | `ReaderResult` timeout envelope isolation, `all-MiniLM-L6-v2` vector claim memory, date-guarded corroboration vs `ESCALATE` | `--simulate-timeout` degraded cleanly (`exit 0`) with zero partial-row vector pollution, surfacing `[single source only]` badges. |
 
 ---
 
-## Evaluation & Perturbation Evidence ([`evaluation/`](evaluation/))
+## 2. Sample Policy Pipeline & Calibration Output ([`evaluation/01-policy-pipeline/pipeline-run.txt`](evaluation/01-policy-pipeline/pipeline-run.txt))
 
-- [`evaluation/calibration_report.py`](evaluation/calibration_report.py) — Computes aggregate and `policy_type × field` sliced Expected Calibration Error (ECE) and Brier decomposition.
-- [`evaluation/perturbation-log.md`](evaluation/perturbation-log.md) — Controlled before/after perturbation traces across `missing_source` 1-call retry halting, mortgage arithmetic repair, and reader timeout injection.
-- [`evaluation/reflection-brief.md`](evaluation/reflection-brief.md) — Failure-mode analysis, threshold trade-offs, and production observability design.
-- [`docs/harness_engineering_case_study.md`](docs/harness_engineering_case_study.md) — Companion study on `stop_reason` loop invariants, `56.8%` deterministic context pruning (`38,708 → 16,736` tokens), and 3-tier atomic state recovery.
+```text
+2026-10-01 21:12:30,517 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:35,734 INFO HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-10-01 21:12:35,735 INFO review_disagreement policy_id=POL-2025-010 fields=['premium_amount']
+{
+  "decisions_written": 9,
+  "auto_approve": 0,
+  "human_review": 9,
+  "spot_check": 0,
+  "escalations": 1,
+  "pattern_summary": {
+    "endorsements_absent": {
+      "count": 1,
+      "policies": [
+        "POL-2025-009"
+      ],
+      "categories": [
+        "missing_source"
+      ]
+    },
+    "premium_does_not_match_components": {
+      "count": 1,
+      "policies": [
+        "POL-2025-010"
+      ],
+      "categories": [
+        "consistency"
+      ]
+    }
+  },
+  "output_path": "routing_decisions.json"
+}
+exit code: 0
+```
+
+Companion architectural brief on `stop_reason` harness loops and `56.8%` context compression: [`docs/harness_engineering_case_study.md`](docs/harness_engineering_case_study.md).
 
 ---
 
-## Quick Start
+## 3. Quick Start
 
 ```bash
-# Run test suites across all three production packages (104 tests)
 (cd packages/policy-extractor && pytest)
 (cd packages/mortgage-extractor && pytest)
 (cd packages/supply-chain-risk && pytest)
-
-# Run sliced Brier confidence calibration report
 python evaluation/calibration_report.py
 ```
 
