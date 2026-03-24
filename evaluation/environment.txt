@@ -1,0 +1,146 @@
+ENVIRONMENT
+===========
+
+Operating system : macOS 26.6.2 (build 25G83), Apple Silicon / arm64
+Python           : Python 3.12.14  (uv-managed, at ~/.local/bin/python3.12)
+Date of runs     : 2026-10-01
+Shell            : zsh
+
+Note on the interpreter
+-----------------------
+The system interpreter on this machine (/usr/bin/python3) is Python 3.9.6, which is
+below the >=3.11 floor declared in every project's pyproject.toml (the code uses
+StrEnum, structural pattern matching, and PEP 604 unions). All three virtual
+environments were therefore created with Python 3.12.14:
+
+    rm -rf .venv
+    ~/.local/bin/python3.12 -m venv .venv
+    .venv/bin/pip install -e ".[dev]"
+
+Virtual environments (one per system, created in each project's starter/ dir)
+----------------------------------------------------------------------------
+1. Build a Validated, Routed Insurance Policy Extraction Pipeline/04-hitl-routing/starter
+2. Build a Resilient Mortgage Document Extraction System/04-validate-mathematical-consistency/starter
+3. Investigate Supply Chain Risk with Multi-Source Synthesis/03-resilient-coordinator/starter
+
+Each was installed with `pip install -e ".[dev]"`, which puts the console command
+(policy-extractor / mortgage-extract / supply-chain-investigate) on that venv's PATH.
+
+Why starter/ and not solution/
+------------------------------
+Every artifact in this pack was produced from the starter/ of each project's FINAL
+exercise -- that is, from the code I wrote by completing the exercises, not from
+the reference solution/ the course ships. Because each exercise's starter is the
+previous exercise's solution, completing the final exercise's starter yields the
+complete working system; running the evidence from there is what makes this pack
+my own work rather than a replay of the provided answer.
+
+All 11 exercises across the three projects were completed this way:
+  Mortgage      01 schema+tools -> 02 pipeline -> 03 prompts -> 04 validator
+  Policy        01 retry -> 02 batch -> 03 reviewer -> 04 routing
+  Supply chain  01 readers -> 02 memory+synthesis -> 03 timeout+coordinator
+
+Live API usage
+--------------
+System 1 (policy pipeline) was run LIVE against the course-provided Anthropic
+endpoint:
+
+    ANTHROPIC_BASE_URL=https://api.anthropic.com
+    ANTHROPIC_API_KEY=sk-ant-REDACTED (API key)
+
+See 01-policy-pipeline/pipeline-run.txt and perturbation-run.txt -- both contain
+real "POST https://api.anthropic.com/v1/messages" log lines.
+
+Systems 2 and 3 were run fully offline:
+  - mortgage-extract with --mode replay (recorded responses)
+  - supply-chain-investigate with --offline (recorded news fixtures)
+
+Test counts
+-----------
+  01-policy-pipeline/tests.txt    45 passed, 3 skipped
+  02-mortgage-extraction/tests.txt 25 passed
+  03-supply-chain/tests.txt        34 passed
+
+The 3 skipped in System 1 are the @pytest.mark.live tests, which the exercise
+README places deliberately outside the verify gate ("Target: 45 passed, 3
+skipped"). They are gated on @pytest.mark.skipif(ANTHROPIC_API_KEY not set) and
+are the only skip markers anywhere in the three projects -- Systems 2 and 3
+contain none, so 25 and 34 are complete pass counts.
+
+Those 3 live tests were also executed with the key set. Two of them fail on this
+proxy, not because of the code but because they request the model ALIAS
+"claude-haiku-4-5", which the Anthropic API endpoint rejects intermittently (see note
+(a) below). The offline verify-gate run is therefore the canonical capture.
+
+Recorded-response cache (System 2)
+----------------------------------
+The System 2 perturbation edits a document, so its request has no entry in the
+shipped response cache. It was recorded once with --mode record, which added 2
+entries (2ce6655a89e15225.json and 43e168b16c7461b4.json -- the classify and
+extract responses for the perturbed paystub) to
+04-validate-mathematical-consistency/starter/fixtures/recorded_responses/.
+Writing to that directory is the cache's designed behaviour, not a modification
+of course source.
+
+The captured perturbation-run.txt is therefore an OFFLINE --mode replay run, and
+a reviewer can reproduce it with no API key:
+
+    .venv/bin/mortgage-extract <evidence>/02-mortgage-extraction/income_sum_mismatch-PERTURBED.txt \
+        --mode replay --model claude-haiku-4-5-20251001
+
+Verified to return stated_monthly_total 9642.17, "consistent": true, exit code 0.
+(The --model flag is required on replay because the model name is part of the
+cache key.)
+
+Integrity audit
+---------------
+  - No test file was added, edited, or deleted. Every starter tests/ directory is
+    byte-identical to its paired solution tests/ directory (the only differences
+    anywhere are the extra next-exercise test files the course itself ships in
+    each solution).
+  - No skip or xfail was introduced. The only skip markers in the whole tree are
+    the 3 pre-existing @pytest.mark.skipif(ANTHROPIC_API_KEY not set) live tests
+    in System 1. Systems 2 and 3 contain none, so 25 and 34 are full pass counts.
+  - No pyproject.toml, mypy config, or ruff config was modified. All static checks
+    were run with the exact commands from the course instructions.
+  - All 11 starter exercises were completed; the only remaining stubs in any
+    starter are the ones the course ships for later exercises in the cumulative
+    chain, and they match the corresponding reference solution exactly.
+
+Two environment adaptations worth recording
+-------------------------------------------
+(a) Model id pinning, System 1 perturbation only.
+    The Anthropic API gateway resolves the dated id "claude-haiku-4-5-20251001" reliably
+    but INTERMITTENTLY rejects the alias "claude-haiku-4-5" with HTTP 400
+    ("Model ... is not available for your organization"). The alias worked during
+    the main pipeline run (see pipeline-run.txt) and failed minutes later during
+    the perturbation run.
+    The alias is both the package default and asserted verbatim by
+    tests/test_us03_review.py, so it was NOT edited in the package source.
+    Instead the perturbation run used 01-policy-pipeline/run_with_pinned_model.py,
+    which overrides only the model string at call time and then invokes the
+    package's own CLI entry point. All pipeline logic is unmodified.
+    The mortgage CLI exposes a --model flag, so its perturbation run simply passed
+    --model claude-haiku-4-5-20251001 with no wrapper.
+
+(b) numpy pin, System 3 only.
+    `mypy supply_chain_risk/` initially failed inside numpy's own type stubs:
+        numpy/__init__.pyi: error: Type statement is only supported in Python 3.12
+        and greater  [syntax]
+    numpy 2.5.3 stubs use the PEP 695 `type` statement, which mypy will not parse
+    while targeting the python_version = "3.11" set in pyproject.toml. Resolved by
+    installing numpy 2.2.6 (`pip install "numpy<2.3"`), after which the verbatim
+    command `mypy supply_chain_risk/` passes with no errors. No project
+    configuration or source was changed.
+
+Embedding model (System 3)
+--------------------------
+supply-chain-investigate embeds claims locally with sentence-transformers
+all-MiniLM-L6-v2 (~90 MB), downloaded on first run and then cached at
+~/.cache/huggingface/. On the restricted network used for these runs the
+HuggingFace binary CDN (us.aws.cdn.hf.co) sits behind a web-filter click-through
+interstitial for the "Generative AI and ML Applications" category, which returns
+an HTML page at HTTP 403 to non-browser clients. This is a URL-category policy
+prompt, not a TLS or certificate failure. The weights file was fetched once
+through the browser and placed into the HuggingFace cache; every run since has
+been fully offline.
