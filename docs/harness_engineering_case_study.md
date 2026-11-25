@@ -1,6 +1,6 @@
 # Reflection Brief — Harness Engineering Capstone
 
-**Author:** Amit Kumar Koshta
+**Author:** Amit Kumar
 **Date:** September 2026
 
 Every answer cites at least one artifact from our runs — a run ID, file path, token count, claim outcome, or test count. Short artifact snippets are pasted where they provide direct evidence.

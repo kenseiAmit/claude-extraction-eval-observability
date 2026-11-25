@@ -1,6 +1,6 @@
 # Reflection Brief — Evaluation and Observability Capstone
 
-**Name:** Amit Kumar Koshta
+**Name:** Amit Kumar
 **Date:** 2026-10-01
 
 > Ground every answer in your own run. When a question asks for a number, file name, or line, paste
