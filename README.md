@@ -14,6 +14,8 @@
 
 ---
 
+![Claude Extraction Eval, Sliced Calibration & Harness Blueprint](docs/images/architecture_blueprint.png)
+
 Production evaluation, confidence calibration, and observability monorepo for **Anthropic Claude** structured extraction and multi-source synthesis pipelines—verified across **`104` `pytest` tests** and controlled fault-injection experiments.
 
 ![Brier Calibration & Perturbation Telemetry](docs/images/brier_calibration_and_perturbation.png)
